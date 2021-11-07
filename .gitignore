@@ -1,1 +1,13 @@
 tmp/main.exe
+vendor/github.com/gorilla/mux/test_helpers.go
+vendor/github.com/gorilla/mux/middleware.go
+vendor/github.com/gorilla/mux/mux.go
+vendor/github.com/gorilla/mux/README.md
+vendor/github.com/gorilla/mux/regexp.go
+vendor/github.com/gorilla/mux/route.go
+goblog.exe
+tmp/build-errors.log
+vendor/modules.txt
+vendor/github.com/gorilla/mux/AUTHORS
+vendor/github.com/gorilla/mux/doc.go
+vendor/github.com/gorilla/mux/LICENSE
