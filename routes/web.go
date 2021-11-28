@@ -3,8 +3,9 @@ package routes
 import (
 	"net/http"
 
+	"goblog/app/http/controllers"
+
 	"github.com/gorilla/mux"
-	"github.com/jeristiano/goblog/app/http/controllers"
 )
 
 // Initialize 初始化路由
