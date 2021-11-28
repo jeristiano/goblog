@@ -432,11 +432,11 @@ func validateArticleFormData(title string, body string) map[string]string {
 }
 
 func main() {
-	initDB()
-	createTables()
+	database.Initialize()
+    db = database.DB
 
-	route.Initialize()
-	router = route.Router
+    route.Initialize()
+    router = route.Router
 
 	router.HandleFunc("/", homeHandler).Methods("GET").Name("home")
 	router.HandleFunc("/about", aboutHandler).Methods("GET").Name("about")

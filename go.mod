@@ -1,4 +1,4 @@
-module github.com/jeristiano/goblog
+module goblog
 
 go 1.17
 
