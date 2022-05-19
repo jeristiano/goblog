@@ -3,6 +3,7 @@ package database
 import (
 	"database/sql"
 	"goblog/pkg/logger"
+	"log"
 	"time"
 
 	"github.com/go-sql-driver/mysql"
@@ -25,12 +26,12 @@ func initDB() {
 	config := mysql.Config{
 		User:                 "root",
 		Passwd:               "123456",
-		Addr:                 "127.0.0.1:3306",
+		Addr:                 "localhost:3306",
 		Net:                  "tcp",
 		DBName:               "goblog",
 		AllowNativePasswords: true,
 	}
-
+	log.Println(config.FormatDSN())
 	// 准备数据库连接池
 	DB, err = sql.Open("mysql", config.FormatDSN())
 	logger.LogError(err)
