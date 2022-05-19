@@ -3,24 +3,16 @@ package controllers
 import (
 	"database/sql"
 	"fmt"
-	"net/http"
-	"text/template"
-
 	"goblog/pkg/logger"
 	"goblog/pkg/route"
 	"goblog/pkg/types"
+	"html/template"
+	"net/http"
 )
 
 // ArticlesController 文章相关页面
 type ArticlesController struct {
 }
-
-type Article struct {
-	Title, Body string
-	ID          int64
-}
-
-var db *sql.DB
 
 // Show 文章详情页面
 func (*ArticlesController) Show(w http.ResponseWriter, r *http.Request) {
@@ -53,11 +45,4 @@ func (*ArticlesController) Show(w http.ResponseWriter, r *http.Request) {
 		logger.LogError(err)
 		tmpl.Execute(w, article)
 	}
-}
-
-func getArticleByID(id string) (Article, error) {
-	article := Article{}
-	query := "SELECT * FROM articles WHERE id = ?"
-	err := db.QueryRow(query, id).Scan(&article.ID, &article.Title, &article.Body)
-	return article, err
 }
