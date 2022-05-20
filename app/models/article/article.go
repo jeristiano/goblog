@@ -1,24 +1,18 @@
 package article
 
 import (
-	"goblog/pkg/model"
-	"goblog/pkg/types"
+	"goblog/pkg/route"
+	"strconv"
 )
 
 // Article 文章模型
 type Article struct {
-	ID    uint64
+	ID    int64
 	Title string
 	Body  string
 }
 
-// Get 通过 ID 获取文章
-func Get(idstr string) (Article, error) {
-	var article Article
-	id := types.StringToUint64(idstr)
-	if err := model.DB.First(&article, id).Error; err != nil {
-		return article, err
-	}
-
-	return article, nil
+// Link 方法用来生成文章链接
+func (a Article) Link() string {
+	return route.Name2URL("articles.show", "id", strconv.FormatInt(a.ID, 10))
 }
