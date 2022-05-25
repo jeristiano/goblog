@@ -34,6 +34,5 @@ func Render(w io.Writer, data interface{}, tplFiles ...string) {
 	logger.LogError(err)
 
 	// 6 渲染模板
-	err = tmpl.ExecuteTemplate(w, "app", data)
-	logger.LogError(err)
+	tmpl.ExecuteTemplate(w, "app", data)
 }
