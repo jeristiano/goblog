@@ -47,15 +47,29 @@ func (*ArticlesController) Show(w http.ResponseWriter, r *http.Request) {
 			fmt.Fprint(w, "500 服务器内部错误")
 		}
 	} else {
-		// 4. 读取成功，显示文章
+		// ---  4. 读取成功，显示文章 ---
+
+		// 4.0 设置模板相对路径
+		viewDir := "resources/views"
+
+		// 4.1 所有布局模板文件 Slice
+		files, err := filepath.Glob(viewDir + "/layouts/*.gohtml")
+		logger.LogError(err)
+
+		// 4.2 在 Slice 里新增我们的目标文件
+		newFiles := append(files, viewDir+"/articles/show.gohtml")
+
+		// 4.3 解析模板文件
 		tmpl, err := template.New("show.gohtml").
 			Funcs(template.FuncMap{
-				"RouteName2URL": route.Name2URL,
-				"Int64ToString": types.Int64ToString,
-			}).
-			ParseFiles("resources/views/articles/show.gohtml")
+				"RouteName2URL":  route.Name2URL,
+				"Uint64ToString": types.Uint64ToString,
+			}).ParseFiles(newFiles...)
 		logger.LogError(err)
-		tmpl.Execute(w, article)
+
+		// 4.4 渲染模板，将所有文章的数据传输进去
+		err = tmpl.ExecuteTemplate(w, "app", article)
+		logger.LogError(err)
 	}
 }
 
@@ -85,7 +99,7 @@ func (*ArticlesController) Index(w http.ResponseWriter, r *http.Request) {
 		logger.LogError(err)
 
 		// 2.4 渲染模板，将所有文章的数据传输进去
-		err = tmpl.ExecuteTemplate(w, "myapp", articles)
+		err = tmpl.ExecuteTemplate(w, "app", articles)
 		logger.LogError(err)
 	}
 }
