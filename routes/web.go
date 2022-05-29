@@ -2,6 +2,7 @@ package routes
 
 import (
 	"goblog/app/http/controllers"
+	"goblog/app/http/middlewares"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -9,6 +10,11 @@ import (
 
 // RegisterWebRoutes 注册网页相关路由
 func RegisterWebRoutes(r *mux.Router) {
+
+	// --- 全局中间件 ---
+
+	// 开始会话
+	r.Use(middlewares.StartSession)
 
 	// 静态页面
 	pc := new(controllers.PagesController)
@@ -34,4 +40,7 @@ func RegisterWebRoutes(r *mux.Router) {
 	auc := new(controllers.AuthController)
 	r.HandleFunc("/auth/register", auc.Register).Methods("GET").Name("auth.register")
 	r.HandleFunc("/auth/do-register", auc.DoRegister).Methods("POST").Name("auth.doregister")
+
+	r.HandleFunc("/auth/login", auc.Login).Methods("GET").Name("auth.login")
+	r.HandleFunc("/auth/dologin", auc.DoLogin).Methods("POST").Name("auth.dologin")
 }
