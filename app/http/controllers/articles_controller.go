@@ -50,7 +50,7 @@ func (*ArticlesController) Index(w http.ResponseWriter, r *http.Request) {
 
 	// 1. 获取结果集
 	articles, err := article.GetAll()
-
+	fmt.Println(articles)
 	if err != nil {
 		// 数据库错误
 		logger.LogError(err)
@@ -59,7 +59,7 @@ func (*ArticlesController) Index(w http.ResponseWriter, r *http.Request) {
 	} else {
 		// ---  2. 加载模板 ---
 		view.Render(w, view.D{
-			"Article": articles,
+			"Articles": articles,
 		}, "articles.index")
 	}
 }

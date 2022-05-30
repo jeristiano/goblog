@@ -2,6 +2,7 @@ package view
 
 import (
 	"goblog/pkg/auth"
+	"goblog/pkg/flash"
 	"goblog/pkg/logger"
 	"goblog/pkg/route"
 	"html/template"
@@ -15,6 +16,10 @@ type D map[string]interface{}
 
 // Render 渲染通用视图
 func Render(w io.Writer, data D, tplFiles ...string) {
+	// 1. 通用模板数据
+	data["isLogined"] = auth.Check()
+	data["loginUser"] = auth.User
+	data["flash"] = flash.All()
 	RenderTemplate(w, "app", data, tplFiles...)
 }
 
