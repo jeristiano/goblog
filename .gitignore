@@ -11,3 +11,5 @@ vendor/modules.txt
 vendor/github.com/gorilla/mux/AUTHORS
 vendor/github.com/gorilla/mux/doc.go
 vendor/github.com/gorilla/mux/LICENSE
+tmp
+.env
