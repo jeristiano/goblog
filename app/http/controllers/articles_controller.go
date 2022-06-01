@@ -5,19 +5,20 @@ import (
 	"goblog/app/http/requests"
 	"goblog/app/models/article"
 	"goblog/app/policies"
-	"goblog/pkg/flash"
+	"goblog/pkg/auth"
 	"goblog/pkg/route"
 	"goblog/pkg/view"
 	"net/http"
 )
 
-// ArticlesController 文章相关页面
+// ArticlesController 处理静态页面
 type ArticlesController struct {
 	BaseController
 }
 
 // Show 文章详情页面
 func (ac *ArticlesController) Show(w http.ResponseWriter, r *http.Request) {
+
 	// 1. 获取 URL 参数
 	id := route.GetRouteVariable("id", r)
 
@@ -45,6 +46,7 @@ func (ac *ArticlesController) Index(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		ac.ResponseForSQLError(w, err)
 	} else {
+
 		// ---  2. 加载模板 ---
 		view.Render(w, view.D{
 			"Articles": articles,
@@ -54,28 +56,25 @@ func (ac *ArticlesController) Index(w http.ResponseWriter, r *http.Request) {
 
 // Create 文章创建页面
 func (*ArticlesController) Create(w http.ResponseWriter, r *http.Request) {
-	view.Render(w, view.D{
-		"Title":   "",
-		"Article": "",
-		"Errors":  make(map[string]string),
-	}, "articles.create", "articles._form_field")
+	view.Render(w, view.D{}, "articles.create", "articles._form_field")
 }
 
 // Store 文章创建页面
 func (*ArticlesController) Store(w http.ResponseWriter, r *http.Request) {
-
 	// 1. 初始化数据
+	currentUser := auth.User()
 	_article := article.Article{
-		Title: r.PostFormValue("title"),
-		Body:  r.PostFormValue("body"),
+		Title:  r.PostFormValue("title"),
+		Body:   r.PostFormValue("body"),
+		UserID: currentUser.ID,
 	}
 
 	// 2. 表单验证
 	errors := requests.ValidateArticleForm(_article)
 
-	// 检查是否有错误
+	// 3. 检测错误
 	if len(errors) == 0 {
-
+		// 创建文章
 		_article.Create()
 		if _article.ID > 0 {
 			indexURL := route.Name2URL("articles.show", "id", _article.GetStringID())
@@ -105,10 +104,10 @@ func (ac *ArticlesController) Edit(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		ac.ResponseForSQLError(w, err)
 	} else {
+
 		// 检查权限
 		if !policies.CanModifyArticle(_article) {
-			flash.Warning("未授权操作！")
-			http.Redirect(w, r, "/", http.StatusFound)
+			ac.ResponseForUnauthorized(w, r)
 		} else {
 			// 4. 读取成功，显示编辑文章表单
 			view.Render(w, view.D{
@@ -133,11 +132,12 @@ func (ac *ArticlesController) Update(w http.ResponseWriter, r *http.Request) {
 		ac.ResponseForSQLError(w, err)
 	} else {
 		// 4. 未出现错误
+
 		// 检查权限
 		if !policies.CanModifyArticle(_article) {
-			flash.Warning("未授权操作！")
-			http.Redirect(w, r, "/", http.StatusForbidden)
+			ac.ResponseForUnauthorized(w, r)
 		} else {
+
 			// 4.1 表单验证
 			_article.Title = r.PostFormValue("title")
 			_article.Body = r.PostFormValue("body")
@@ -164,18 +164,14 @@ func (ac *ArticlesController) Update(w http.ResponseWriter, r *http.Request) {
 					fmt.Fprint(w, "您没有做任何更改！")
 				}
 			} else {
-				// 检查权限
-				if !policies.CanModifyArticle(_article) {
-					flash.Warning("未授权操作！")
-					http.Redirect(w, r, "/", http.StatusForbidden)
-				} // 4.3 表单验证不通过，显示理由
+
+				// 4.3 表单验证不通过，显示理由
 				view.Render(w, view.D{
 					"Article": _article,
 					"Errors":  errors,
 				}, "articles.edit", "articles._form_field")
 			}
 		}
-
 	}
 }
 
@@ -192,10 +188,10 @@ func (ac *ArticlesController) Delete(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		ac.ResponseForSQLError(w, err)
 	} else {
+
 		// 检查权限
 		if !policies.CanModifyArticle(_article) {
-			flash.Warning("您没有权限执行此操作！")
-			http.Redirect(w, r, "/", http.StatusFound)
+			ac.ResponseForUnauthorized(w, r)
 		} else {
 			// 4. 未出现错误，执行删除操作
 			rowsAffected, err := _article.Delete()
@@ -218,6 +214,5 @@ func (ac *ArticlesController) Delete(w http.ResponseWriter, r *http.Request) {
 				}
 			}
 		}
-
 	}
 }
